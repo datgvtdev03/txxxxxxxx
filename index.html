@@ -317,6 +317,50 @@
       }
     });
 
+    // Bắt đầu kéo trên cảm ứng
+cover.addEventListener("touchstart", (e) => {
+  if (!readyToReveal) return;
+  isDragging = true;
+  const touch = e.touches[0];
+  startX = touch.clientX;
+  startY = touch.clientY;
+  cover.classList.add("dragging");
+});
+
+// Di chuyển trên cảm ứng
+document.addEventListener("touchmove", (e) => {
+  if (!isDragging) return;
+  const touch = e.touches[0];
+  const deltaX = touch.clientX - startX;
+  const deltaY = touch.clientY - startY;
+
+  let newLeft = Math.max(-180, Math.min(180, deltaX));
+  let newTop = Math.max(-180, Math.min(180, deltaY));
+
+  currentLeft = newLeft;
+  currentTop = newTop;
+
+  cover.style.left = newLeft + "px";
+  cover.style.top = newTop + "px";
+
+  if ((Math.abs(newTop) > 150 || Math.abs(newLeft) > 150) && readyToReveal) {
+    finalizeReveal();
+  }
+}, { passive: false });
+
+// Kết thúc kéo trên cảm ứng
+document.addEventListener("touchend", () => {
+  if (!isDragging) return;
+  isDragging = false;
+  cover.classList.remove("dragging");
+
+  if (Math.abs(currentLeft) < 150 && Math.abs(currentTop) < 150) {
+    cover.style.left = "0px";
+    cover.style.top = "0px";
+  }
+});
+
+
 
     function finalizeReveal() {
       readyToReveal = false;
